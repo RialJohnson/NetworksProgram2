@@ -116,22 +116,22 @@ class RDT:
 
                 if response_r.seq_num < self.seq_num:
                     # Sending me data again
-                    print('Reciever is behind sender')
+                    print('SENDER: Reciever seq # is behind sender seq #')
                     test = Packet(response_r.seq_num, "1")
                     self.network.udt_send(test.get_byte_S())
                     
                 elif response_r.msg_S is "1":
                     # Received ACK, proceed
-                    print('ACK received')
+                    print('SENDER: ACK received')
                     self.seq_num += 1 # Breaks while loop
                     
                 elif response_r.msg_S is "0":
                     # NAK received
-                    print('NAK received... resend')
+                    print('SENDER: NAK received... resend')
                     self.byte_buffer = ''
             else:
                 # Corrupt ACK
-                print('Corrupt ACK')
+                print('SENDER: Corrupt ACK')
                 self.byte_buffer = ''
                     
 
@@ -140,6 +140,7 @@ class RDT:
         byte_S = self.network.udt_receive()
         self.byte_buffer += byte_S
         current_seq = self.seq_num
+        
         # Don't move on until seq_num has been toggled
         # keep extracting packets - if reordered, could get more than one
         while current_seq == self.seq_num:
@@ -173,12 +174,14 @@ class RDT:
                     # SEND ACK
                     answer = Packet(self.seq_num, "1")
                     self.network.udt_send(answer.get_byte_S())
-                    self.seq_num += 1
+                    self.seq_num += 1 # Breaks While Loop
 
                 ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
+
             # remove the packet bytes from the buffer
             self.byte_buffer = self.byte_buffer[length:]
             # if this was the last packet, will return on the next iteration
+
         return ret_S
 
 
