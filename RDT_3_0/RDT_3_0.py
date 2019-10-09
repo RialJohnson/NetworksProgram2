@@ -57,10 +57,16 @@ class Packet:
         # and check if the same
         return checksum_S != computed_checksum_S
 
+    def is_ack_pack(self):
+        if self.msg_S == '1' or self.msg_S == '0':
+            return True
+        return False
+
 
 class RDT:
     # latest sequence number used in a packet
-    seq_num = 1
+    seq_num = 0
+
     # buffer of bytes read from network
     byte_buffer = ''
 
@@ -76,14 +82,7 @@ class RDT:
     def rdt_1_0_receive(self):
         pass
 
-    def rdt_2_1_send(self, msg_S):
-        pass
-
-    def rdt_2_1_receive(self):
-        pass
-
-    def rdt_3_0_send(self, msg_S):
-        print("Hello, Im inside 3.0")
+    def rdt_2_1_send(self, msg_S):  # Add sequence number
         p = Packet(self.seq_num, msg_S)
         cur_seq = self.seq_num
 
@@ -124,7 +123,7 @@ class RDT:
                 print('SENDER: Corrupt ACK')
                 self.byte_buffer = ''
 
-    def rdt_3_0_receive(self):
+    def rdt_2_1_receive(self):
         ret_S = None
         byte_S = self.network.udt_receive()
         self.byte_buffer += byte_S
@@ -171,24 +170,10 @@ class RDT:
             self.byte_buffer = self.byte_buffer[length:]
             # if this was the last packet, will return on the next iteration
 
+        return ret_S
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='RDT implementation.')
-    parser.add_argument('role', help='Role is either client or server.', choices=[
-                        'client', 'server'])
-    parser.add_argument('server', help='Server.')
-    parser.add_argument('port', help='Port.', type=int)
-    args = parser.parse_args()
+    def rdt_3_0_send(self, msg_S):
+        pass
 
-    rdt = RDT(args.role, args.server, args.port)
-    if args.role == 'client':
-        rdt.rdt_3_0_send('MSG_FROM_CLIENT')
-        sleep(2)
-        print(rdt.rdt_3_0_receive())
-        rdt.disconnect()
-
-    else:
-        sleep(1)
-        print(rdt.rdt_3_0_receive())
-        rdt.rdt_3_0_send('MSG_FROM_SERVER')
-        rdt.disconnect()
+    def rdt_3_0_receive(self):
+        pass
