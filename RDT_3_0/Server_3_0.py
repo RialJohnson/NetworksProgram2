@@ -1,5 +1,5 @@
 import argparse
-import RDT
+import RDT_3_0 as RDT
 import time
 
 
@@ -27,7 +27,8 @@ def piglatinize(message):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Pig Latin conversion server.')
+    parser = argparse.ArgumentParser(
+        description='Pig Latin conversion server.')
     parser.add_argument('port', help='Port.', type=int)
     args = parser.parse_args()
 

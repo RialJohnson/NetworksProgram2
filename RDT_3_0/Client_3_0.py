@@ -1,9 +1,10 @@
 import argparse
-import RDT
+import RDT_3_0 as RDT
 import time
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Quotation client talking to a Pig Latin server.')
+    parser = argparse.ArgumentParser(
+        description='Quotation client talking to a Pig Latin server.')
     parser.add_argument('server', help='Server.')
     parser.add_argument('port', help='Port.', type=int)
     args = parser.parse_args()

@@ -3,10 +3,10 @@ import socket
 import threading
 from time import sleep
 import random
-import RDT
+import RDT_3_0 as RDT
 
 
-## Provides an abstraction for the network layer
+# Provides an abstraction for the network layer
 class NetworkLayer:
     # configuration parameters
     prob_pkt_loss = 0
@@ -39,7 +39,8 @@ class NetworkLayer:
             self.conn.settimeout(self.socket_timeout)
 
         # start the thread to receive data on the connection
-        self.collect_thread = threading.Thread(name='Collector', target=self.collect)
+        self.collect_thread = threading.Thread(
+            name='Collector', target=self.collect)
         self.stop = False
         self.collect_thread.start()
 
@@ -49,8 +50,10 @@ class NetworkLayer:
             self.collect_thread.join()
 
     def __del__(self):
-        if self.sock is not None: self.sock.close()
-        if self.conn is not None: self.conn.close()
+        if self.sock is not None:
+            self.sock.close()
+        if self.conn is not None:
+            self.conn.close()
 
     def udt_send(self, msg_S):
         # return without sending if the packet is being dropped
@@ -62,7 +65,8 @@ class NetworkLayer:
                                    len(msg_S) - 5)  # make sure we are not corrupting the length field,
             # since that makes life really difficult
             num = random.randint(1, 5)
-            repl_S = ''.join(random.sample('XXXXX', num))  # sample length >= num
+            repl_S = ''.join(random.sample('XXXXX', num)
+                             )  # sample length >= num
             msg_S = msg_S[:start] + repl_S + msg_S[start + num:]
         # reorder packets - either hold a packet back, or if one held back then send both
         if random.random() < self.prob_pkt_reorder or self.reorder_msg_S:
@@ -81,7 +85,7 @@ class NetworkLayer:
                 raise RuntimeError("socket connection broken")
             totalsent = totalsent + sent
 
-    ## Receive data from the network and save in internal buffer
+    # Receive data from the network and save in internal buffer
     def collect(self):
         #         print (threading.currentThread().getName() + ': Starting')
         while (True):
@@ -98,7 +102,7 @@ class NetworkLayer:
                 #                 print (threading.currentThread().getName() + ': Ending')
                 return
 
-    ## Deliver collected data to client
+    # Deliver collected data to client
     def udt_receive(self):
         with self.lock:
             ret_S = self.buffer_S
@@ -107,8 +111,10 @@ class NetworkLayer:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Network layer implementation.')
-    parser.add_argument('role', help='Role is either client or server.', choices=['client', 'server'])
+    parser = argparse.ArgumentParser(
+        description='Network layer implementation.')
+    parser.add_argument('role', help='Role is either client or server.', choices=[
+                        'client', 'server'])
     parser.add_argument('server', help='Server.')
     parser.add_argument('port', help='Port.', type=int)
     args = parser.parse_args()
