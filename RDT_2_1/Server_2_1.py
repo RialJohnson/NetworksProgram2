@@ -36,6 +36,7 @@ if __name__ == '__main__':
 
     rdt = RDT.RDT('server', None, args.port)
     try:
+        print("As Receiver")
         while (True):
             # try to receiver message before timeout
             msg_S = rdt.rdt_2_1_receive()
@@ -48,6 +49,7 @@ if __name__ == '__main__':
 
             # convert and reply
             rep_msg_S = piglatinize(msg_S)
+            print("As sender")
             rdt.rdt_2_1_send(rep_msg_S)
             print('Converted: %s \nto: \n%s\n' % (msg_S, rep_msg_S))
             
