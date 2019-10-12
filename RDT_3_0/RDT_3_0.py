@@ -68,8 +68,6 @@ class RDT:
     # latest sequence number used in a packet
     seq_num = 0
 
-    timeout = 10
-
     # buffer of bytes read from network
     byte_buffer = ''
 
@@ -87,24 +85,31 @@ class RDT:
         while cur_seq == self.seq_num:
             # message is sent from sender
             self.network.udt_send(p.get_byte_S())
+
+            # initialize variables for timeout
             global packetLost
             packetLost = True
-            patketTimeout = 5
+            packetTimeout = 5
             startTime = time.time()
             response = ''
-            while (startTime + patketTimeout > time.time()):
+
+            while (startTime + packetTimeout > time.time()):
                 response = self.network.udt_receive()
+
+                # If we have a valid response...
                 if (response != ''):
-                    print("packet was not lost")
-                    print(response + " was the response")
+                    print("packet recieved, its contents are: ")
+                    print(response)
                     packetLost = False
                     return
                 else:
-                    print("sleeping for a sec")
+                    # Keep waiting till the timeout has passed
+                    print("waiting for packet or timeout: sleeping for a sec")
                     time.sleep(1)
 
+            # if the packet was lost, continue...
             if (packetLost):
-                print("packet was lost!")
+                print("timeout expired: packet was lost :(")
                 continue
 
             # Variable length of message
